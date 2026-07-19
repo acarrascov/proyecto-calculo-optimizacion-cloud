@@ -3,12 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Simulador 3D · Optimización de Costos Cloud</title>
-<meta name="description" content="Simulador interactivo 3D del costo de infraestructura cloud y su derivada." />
+<title>Simulador · Optimización de Costos Cloud</title>
+<meta name="description" content="Simulador interactivo del costo de infraestructura cloud y su derivada." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body class="sim-page">
@@ -23,10 +29,10 @@
   </nav>
   <div class="sim-title">
     <span class="hero-badge">◆ Herramienta tecnológica</span>
-    <h1>Simulador 3D del costo de infraestructura cloud</h1>
+    <h1>Simulador del costo de infraestructura cloud</h1>
     <p class="subtitle">
-      Superficie $C(x,a) = a x^2 + (b+c)x + d$ &nbsp;·&nbsp; el punto rojo marca el mínimo según
-      el criterio de la primera y segunda derivada. Arrastra para rotar, usa scroll para zoom.
+      Curva $C(x) = a x^2 + (b+c)x + d$ y su derivada $C'(x) = 2ax + (b+c)$ &nbsp;·&nbsp; el punto
+      rosado marca el mínimo, donde la derivada se anula y cambia de signo.
     </p>
   </div>
 </header>
@@ -54,8 +60,8 @@
   </section>
 
   <section class="plot-stage">
-    <div id="plot3d" class="plot-3d-full"></div>
-    <p class="plot-hint">🖱️ Arrastra para rotar &nbsp;·&nbsp; <strong>Ctrl</strong> / <strong>Cmd</strong> + scroll para hacer zoom &nbsp;·&nbsp; el punto rosado marca el mínimo real</p>
+    <div id="plotChart" class="plot-3d-full"></div>
+    <p class="plot-hint">📈 Curva cian: costo total &nbsp;·&nbsp; curva violeta punteada: costo marginal (derivada) &nbsp;·&nbsp; el punto rosado marca el mínimo, donde la derivada cruza cero</p>
   </section>
 </main>
 

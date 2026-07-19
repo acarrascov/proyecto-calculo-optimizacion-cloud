@@ -1,4 +1,4 @@
-// Simulador 3D a pantalla completa: superficie C(x, a) = a*x^2 + (b+c)*x + d
+// Simulador 2D: C(x) = a*x^2 + (b+c)*x + d, y su derivada C'(x) = 2ax + (b+c)
 const paramA = document.getElementById('paramA');
 const paramB = document.getElementById('paramB');
 const paramD = document.getElementById('paramD');
@@ -6,38 +6,30 @@ const valA = document.getElementById('valA');
 const valB = document.getElementById('valB');
 const valD = document.getElementById('valD');
 const resultBox = document.getElementById('resultBox');
-const plotDiv = document.getElementById('plot3d');
+const plotDiv = document.getElementById('plotChart');
 
 function costo(a, b, d, x) {
   return a * x * x + b * x + d;
 }
 
-// Rangos fijos para construir la superficie (x = instancias, y = parámetro a)
+function costoMarginal(a, b, x) {
+  return 2 * a * x + b;
+}
+
 const X_MAX = 45;
-const A_MIN = 0.1;
-const A_MAX = 2;
-const A_STEPS = 50;
-const X_STEPS = 70;
+const X_STEPS = 200;
 
-function construirSuperficie(b, d) {
+function construirCurvas(a, b, d) {
   const xVals = [];
-  const aVals = [];
-  const zMatrix = [];
-
+  const yCosto = [];
+  const yMarginal = [];
   for (let i = 0; i <= X_STEPS; i++) {
-    xVals.push((X_MAX * i) / X_STEPS);
+    const x = (X_MAX * i) / X_STEPS;
+    xVals.push(x);
+    yCosto.push(costo(a, b, d, x));
+    yMarginal.push(costoMarginal(a, b, x));
   }
-  for (let j = 0; j <= A_STEPS; j++) {
-    aVals.push(A_MIN + ((A_MAX - A_MIN) * j) / A_STEPS);
-  }
-  for (let j = 0; j <= A_STEPS; j++) {
-    const fila = [];
-    for (let i = 0; i <= X_STEPS; i++) {
-      fila.push(costo(aVals[j], b, d, xVals[i]));
-    }
-    zMatrix.push(fila);
-  }
-  return { xVals, aVals, zMatrix };
+  return { xVals, yCosto, yMarginal };
 }
 
 let plotIniciado = false;
@@ -58,111 +50,122 @@ function calcular() {
 
   resultBox.innerHTML = `Punto óptimo: <strong>x = ${xOptimoRedondeado}</strong> instancias &nbsp;|&nbsp; Costo mínimo: <strong>${costoMinimo.toFixed(1)} USD/mes</strong>`;
 
-  const { xVals, aVals, zMatrix } = construirSuperficie(b, d);
+  const { xVals, yCosto, yMarginal } = construirCurvas(a, b, d);
 
-  const superficie = {
-    type: 'surface',
+  // Curva principal: costo total C(x), con relleno degradado hacia abajo
+  const curvaCosto = {
+    type: 'scatter',
+    mode: 'lines',
     x: xVals,
-    y: aVals,
-    z: zMatrix,
-    colorscale: 'Viridis',
-    reversescale: false,
-    opacity: 1,
-    showscale: true,
-    colorbar: {
-      title: 'USD/mes',
-      titleside: 'right',
-      titlefont: { color: '#cbd5e1', size: 12 },
-      tickfont: { color: '#94a3b8', size: 11 },
-      outlinewidth: 0,
-      len: 0.75,
-      thickness: 14,
-    },
-    contours: {
-      z: { show: true, usecolormap: true, highlightcolor: '#ffffff', project: { z: true }, width: 1 },
-    },
-    lighting: { ambient: 0.55, diffuse: 0.85, specular: 0.25, roughness: 0.65, fresnel: 0.2 },
-    lightposition: { x: 100, y: -100, z: 200 },
+    y: yCosto,
+    name: 'Costo total C(x)',
+    line: { color: '#22d3ee', width: 4, shape: 'spline' },
+    fill: 'tozeroy',
+    fillcolor: 'rgba(34, 211, 238, 0.12)',
+    hovertemplate: 'x = %{x:.0f} instancias<br>C(x) = %{y:.1f} USD/mes<extra></extra>',
   };
 
-  // Curva de mínimos: traza el punto óptimo para cada valor de "a" en la superficie
-  const curvaMinimos = {
-    type: 'scatter3d',
+  // Curva secundaria: costo marginal C'(x), en eje Y secundario
+  const curvaMarginal = {
+    type: 'scatter',
     mode: 'lines',
-    x: aVals.map(av => Math.max(0, -b / (2 * av))),
-    y: aVals,
-    z: aVals.map(av => {
-      const xm = Math.max(0, -b / (2 * av));
-      return costo(av, b, d, xm);
-    }),
-    line: { color: '#ffffff', width: 7 },
-    name: 'Curva de mínimos',
+    x: xVals,
+    y: yMarginal,
+    name: "Costo marginal C'(x)",
+    yaxis: 'y2',
+    line: { color: '#a855f7', width: 2.5, dash: 'dash' },
+    hovertemplate: "x = %{x:.0f}<br>C'(x) = %{y:.1f}<extra></extra>",
   };
 
-  // Techo de la superficie, usado para dibujar la línea de proyección vertical
-  const zTecho = Math.max(...zMatrix.flat());
-  const zPiso = Math.min(...zMatrix.flat());
-
-  // Línea vertical que "cae" desde el techo hasta el punto óptimo real (ancla visual)
-  const lineaProyeccion = {
-    type: 'scatter3d',
-    mode: 'lines',
-    x: [xOptimoRedondeado, xOptimoRedondeado],
-    y: [a, a],
-    z: [zTecho, costoMinimo],
-    line: { color: '#f472b6', width: 4, dash: 'dot' },
-    showlegend: false,
-    hoverinfo: 'skip',
-  };
-
-  // Punto óptimo actual (marcador brillante, según el slider "a")
+  // Punto óptimo sobre la curva de costo
   const puntoOptimo = {
-    type: 'scatter3d',
+    type: 'scatter',
     mode: 'markers+text',
     x: [xOptimoRedondeado],
-    y: [a],
-    z: [costoMinimo],
-    marker: { color: '#f472b6', size: 12, symbol: 'diamond', line: { color: '#ffffff', width: 1.5 } },
-    text: [`x=${xOptimoRedondeado}`],
-    textposition: 'top center',
+    y: [costoMinimo],
+    name: 'Mínimo',
+    marker: { color: '#f472b6', size: 14, symbol: 'diamond', line: { color: '#ffffff', width: 2 } },
+    text: [`  Mínimo: x=${xOptimoRedondeado}`],
+    textposition: 'middle right',
     textfont: { color: '#f472b6', size: 13, family: 'JetBrains Mono, monospace' },
-    name: `Mínimo actual (x=${xOptimoRedondeado})`,
+    hovertemplate: `Óptimo: x=${xOptimoRedondeado}, C=${costoMinimo.toFixed(1)} USD<extra></extra>`,
   };
+
+  // Donde la marginal cruza cero (referencia visual del criterio de la derivada)
+  const puntoCeroMarginal = {
+    type: 'scatter',
+    mode: 'markers',
+    x: [xOptimoRedondeado],
+    y: [0],
+    yaxis: 'y2',
+    name: "C'(x) = 0",
+    marker: { color: '#a855f7', size: 10, symbol: 'circle', line: { color: '#ffffff', width: 1.5 } },
+    showlegend: false,
+    hovertemplate: `C'(x)=0 en x=${xOptimoRedondeado}<extra></extra>`,
+  };
+
+  const yMax = Math.max(...yCosto) * 1.08;
 
   const layout = {
     autosize: true,
-    margin: { l: 0, r: 0, t: 45, b: 0 },
+    margin: { l: 70, r: 70, t: 55, b: 60 },
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
     font: { color: '#cbd5e1', family: 'Space Grotesk, sans-serif' },
     title: {
       text: `Costo mínimo: <span style="color:#5eead4">${costoMinimo.toFixed(1)} USD/mes</span> en x = ${xOptimoRedondeado} instancias`,
-      font: { color: '#e6ebf5', size: 16, family: 'Space Grotesk, sans-serif' },
+      font: { color: '#e6ebf5', size: 17, family: 'Space Grotesk, sans-serif' },
       x: 0.02,
       xanchor: 'left',
     },
-    scene: {
-      xaxis: { title: 'x — instancias', gridcolor: 'rgba(148,163,184,0.2)', zerolinecolor: 'rgba(148,163,184,0.35)', color: '#cbd5e1', backgroundcolor: 'rgba(148,163,184,0.03)', showbackground: true },
-      yaxis: { title: 'a — saturación', gridcolor: 'rgba(148,163,184,0.2)', zerolinecolor: 'rgba(148,163,184,0.35)', color: '#cbd5e1', backgroundcolor: 'rgba(148,163,184,0.03)', showbackground: true },
-      zaxis: { title: 'Costo (USD/mes)', gridcolor: 'rgba(148,163,184,0.2)', zerolinecolor: 'rgba(148,163,184,0.35)', color: '#cbd5e1', backgroundcolor: 'rgba(148,163,184,0.05)', showbackground: true, range: [zPiso, zTecho] },
-      aspectmode: 'manual',
-      aspectratio: { x: 1.3, y: 1, z: 0.75 },
-      camera: {
-        eye: { x: 1.35, y: -1.9, z: 1.05 },
-        center: { x: 0, y: 0, z: -0.15 },
-      },
-      bgcolor: 'rgba(0,0,0,0)',
+    xaxis: {
+      title: 'x — número de instancias',
+      gridcolor: 'rgba(148,163,184,0.14)',
+      zerolinecolor: 'rgba(148,163,184,0.3)',
+      color: '#94a3b8',
+      range: [0, X_MAX],
     },
-    legend: { orientation: 'h', x: 0, y: 0, font: { color: '#cbd5e1' } },
+    yaxis: {
+      title: 'Costo total C(x) — USD/mes',
+      gridcolor: 'rgba(148,163,184,0.14)',
+      zerolinecolor: 'rgba(148,163,184,0.3)',
+      color: '#22d3ee',
+      range: [0, yMax],
+    },
+    yaxis2: {
+      title: "Costo marginal C'(x)",
+      overlaying: 'y',
+      side: 'right',
+      color: '#a855f7',
+      gridcolor: 'rgba(0,0,0,0)',
+      zeroline: true,
+      zerolinecolor: 'rgba(168,85,247,0.45)',
+      zerolinewidth: 1.5,
+    },
+    shapes: [
+      // Línea vertical punteada desde el eje X hasta el punto óptimo
+      {
+        type: 'line',
+        x0: xOptimoRedondeado,
+        x1: xOptimoRedondeado,
+        y0: 0,
+        y1: costoMinimo,
+        line: { color: 'rgba(244,114,182,0.55)', width: 2, dash: 'dot' },
+      },
+    ],
+    legend: { orientation: 'h', x: 0, y: 1.14, font: { color: '#cbd5e1', size: 12 } },
+    hovermode: 'x unified',
   };
 
-  const config = { responsive: true, displaylogo: false, scrollZoom: true };
+  const config = { responsive: true, displaylogo: false };
+
+  const datos = [curvaCosto, curvaMarginal, puntoOptimo, puntoCeroMarginal];
 
   if (!plotIniciado) {
-    Plotly.newPlot(plotDiv, [superficie, curvaMinimos, lineaProyeccion, puntoOptimo], layout, config);
+    Plotly.newPlot(plotDiv, datos, layout, config);
     plotIniciado = true;
   } else {
-    Plotly.react(plotDiv, [superficie, curvaMinimos, lineaProyeccion, puntoOptimo], layout, config);
+    Plotly.react(plotDiv, datos, layout, config);
   }
 }
 
@@ -170,21 +173,5 @@ function calcular() {
 window.addEventListener('resize', () => {
   if (plotIniciado) Plotly.Plots.resize(plotDiv);
 });
-
-// Evita que el scroll normal de la página quede "atrapado" haciendo zoom del
-// gráfico 3D: solo se hace zoom si el usuario mantiene presionado Ctrl/Cmd
-// mientras usa la rueda; de lo contrario el scroll pasa de largo a la página.
-const plotStage = plotDiv.closest('.plot-stage') || plotDiv.parentElement;
-plotStage.addEventListener(
-  'wheel',
-  (e) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      return;
-    }
-    e.stopPropagation();
-  },
-  { capture: true, passive: false }
-);
 
 calcular();
