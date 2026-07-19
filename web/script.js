@@ -6,7 +6,7 @@ navLinks.querySelectorAll('a').forEach(a =>
   a.addEventListener('click', () => navLinks.classList.remove('open'))
 );
 
-// Simulador interactivo: C(x) = a*x^2 + (b+c)*x + d
+// Simulador 3D: superficie C(x, a) = a*x^2 + (b+c)*x + d
 const paramA = document.getElementById('paramA');
 const paramB = document.getElementById('paramB');
 const paramD = document.getElementById('paramD');
@@ -14,13 +14,41 @@ const valA = document.getElementById('valA');
 const valB = document.getElementById('valB');
 const valD = document.getElementById('valD');
 const resultBox = document.getElementById('resultBox');
-
-const ctx = document.getElementById('costChart').getContext('2d');
-let chart;
+const plotDiv = document.getElementById('plot3d');
 
 function costo(a, b, d, x) {
   return a * x * x + b * x + d;
 }
+
+// Rangos fijos para construir la superficie (x = instancias, y = parámetro a)
+const X_MAX = 45;
+const A_MIN = 0.1;
+const A_MAX = 2;
+const A_STEPS = 40;
+const X_STEPS = 60;
+
+function construirSuperficie(b, d) {
+  const xVals = [];
+  const aVals = [];
+  const zMatrix = [];
+
+  for (let i = 0; i <= X_STEPS; i++) {
+    xVals.push((X_MAX * i) / X_STEPS);
+  }
+  for (let j = 0; j <= A_STEPS; j++) {
+    aVals.push(A_MIN + ((A_MAX - A_MIN) * j) / A_STEPS);
+  }
+  for (let j = 0; j <= A_STEPS; j++) {
+    const fila = [];
+    for (let i = 0; i <= X_STEPS; i++) {
+      fila.push(costo(aVals[j], b, d, xVals[i]));
+    }
+    zMatrix.push(fila);
+  }
+  return { xVals, aVals, zMatrix };
+}
+
+let plotIniciado = false;
 
 function calcular() {
   const a = parseFloat(paramA.value);
@@ -38,49 +66,73 @@ function calcular() {
 
   resultBox.innerHTML = `Punto óptimo: <strong>x = ${xOptimoRedondeado}</strong> instancias &nbsp;|&nbsp; Costo mínimo: <strong>${costoMinimo.toFixed(1)} USD/mes</strong>`;
 
-  const xVals = [];
-  const cVals = [];
-  const maxX = Math.max(40, xOptimoRedondeado * 2);
-  for (let x = 0; x <= maxX; x++) {
-    xVals.push(x);
-    cVals.push(costo(a, b, d, x));
-  }
+  const { xVals, aVals, zMatrix } = construirSuperficie(b, d);
 
-  if (chart) chart.destroy();
-  chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: xVals,
-      datasets: [
-        {
-          label: 'C(x) - Costo total (USD/mes)',
-          data: cVals,
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37,99,235,0.1)',
-          pointRadius: 0,
-          borderWidth: 2,
-          tension: 0.2,
-        },
-        {
-          label: `Mínimo (x=${xOptimoRedondeado})`,
-          data: xVals.map(x => (x === xOptimoRedondeado ? costoMinimo : null)),
-          borderColor: '#f97316',
-          backgroundColor: '#f97316',
-          pointRadius: 6,
-          showLine: false,
-        },
-      ],
+  const superficie = {
+    type: 'surface',
+    x: xVals,
+    y: aVals,
+    z: zMatrix,
+    colorscale: 'Viridis',
+    opacity: 0.95,
+    showscale: true,
+    colorbar: { title: 'USD/mes', titleside: 'right' },
+    contours: {
+      z: { show: true, usecolormap: true, highlightcolor: '#f97316', project: { z: true } },
     },
-    options: {
-      responsive: true,
-      plugins: { legend: { position: 'top' } },
-      scales: {
-        x: { title: { display: true, text: 'x (número de instancias)' } },
-        y: { title: { display: true, text: 'Costo (USD/mes)' } },
-      },
+  };
+
+  // Curva de mínimos: traza el punto óptimo para cada valor de "a" en la superficie
+  const curvaMinimos = {
+    type: 'scatter3d',
+    mode: 'lines',
+    x: aVals.map(av => Math.max(0, -b / (2 * av))),
+    y: aVals,
+    z: aVals.map(av => {
+      const xm = Math.max(0, -b / (2 * av));
+      return costo(av, b, d, xm);
+    }),
+    line: { color: '#ffffff', width: 5 },
+    name: 'Curva de mínimos',
+  };
+
+  // Punto óptimo actual (marcador rojo, según el slider "a")
+  const puntoOptimo = {
+    type: 'scatter3d',
+    mode: 'markers',
+    x: [xOptimoRedondeado],
+    y: [a],
+    z: [costoMinimo],
+    marker: { color: '#ef4444', size: 8, symbol: 'diamond' },
+    name: `Mínimo actual (x=${xOptimoRedondeado})`,
+  };
+
+  const layout = {
+    autosize: true,
+    height: 560,
+    margin: { l: 0, r: 0, t: 10, b: 0 },
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    scene: {
+      xaxis: { title: 'x (instancias)' },
+      yaxis: { title: 'a (saturación)' },
+      zaxis: { title: 'Costo (USD/mes)' },
+      camera: { eye: { x: 1.6, y: -1.6, z: 0.9 } },
     },
-  });
+    legend: { orientation: 'h', x: 0, y: 0 },
+  };
+
+  const config = { responsive: true, displaylogo: false };
+
+  if (!plotIniciado) {
+    Plotly.newPlot(plotDiv, [superficie, curvaMinimos, puntoOptimo], layout, config);
+    plotIniciado = true;
+  } else {
+    Plotly.react(plotDiv, [superficie, curvaMinimos, puntoOptimo], layout, config);
+  }
 }
 
 [paramA, paramB, paramD].forEach(input => input.addEventListener('input', calcular));
+window.addEventListener('resize', () => {
+  if (plotIniciado) Plotly.Plots.resize(plotDiv);
+});
 calcular();

@@ -12,39 +12,44 @@
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body>
 
+<div class="bg-decor" aria-hidden="true"></div>
+
 <header class="hero">
   <nav class="navbar">
-    <span class="brand">Cálculo · Proyecto ABPro</span>
+    <span class="brand"><span class="brand-dot"></span> Cálculo · Proyecto ABPro</span>
     <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
     <ul class="nav-links" id="navLinks">
       <li><a href="#problematica">Problemática</a></li>
       <li><a href="#objetivos">Objetivos</a></li>
       <li><a href="#modelo">Modelo</a></li>
-      <li><a href="#simulador">Simulador</a></li>
+      <li><a href="#simulador">Simulador 3D</a></li>
       <li><a href="#resultados">Resultados</a></li>
       <li><a href="#video">Video</a></li>
       <li><a href="#bibliografia">Bibliografía</a></li>
     </ul>
   </nav>
   <div class="hero-content">
-    <h1>Minimización del costo de alojamiento en la nube</h1>
+    <span class="hero-badge">Proyecto de Aplicación · Unidad 3</span>
+    <h1>Minimización del costo de alojamiento <span class="highlight">en la nube</span></h1>
     <p class="subtitle">Aplicación de la Derivada a un problema real de Ingeniería en Informática</p>
     <div class="hero-meta">
-      <span>Asignatura: Cálculo</span>
-      <span>Carrera: Ingeniería en Informática</span>
-      <span>Unidad 3 · Aplicación de la Derivada</span>
+      <span>📘 Asignatura: Cálculo</span>
+      <span>💻 Carrera: Ingeniería en Informática</span>
+      <span>📐 Unidad 3 · Aplicación de la Derivada</span>
     </div>
+    <a href="#simulador" class="cta-button">Ver simulador 3D ↓</a>
   </div>
 </header>
 
 <main>
 
   <section id="problematica" class="section">
-    <h2>Definición del proyecto y problemática</h2>
+    <span class="eyebrow">01 · Contexto</span>
+    <h2>🧩 Definición del proyecto y problemática</h2>
     <p>
       Las empresas de desarrollo de software que alojan aplicaciones web en servidores en la nube
       (AWS, Azure, GCP) pagan por dos componentes principales: <strong>capacidad de procesamiento
@@ -61,14 +66,17 @@
   </section>
 
   <section id="objetivos" class="section alt">
-    <h2>Objetivos y preguntas de investigación</h2>
+    <span class="eyebrow">02 · Ruta de trabajo</span>
+    <h2>🎯 Objetivos y preguntas de investigación</h2>
     <div class="grid-2">
       <div class="card">
+        <div class="card-icon">🧭</div>
         <h3>Objetivo general</h3>
         <p>Determinar, mediante el uso de derivadas, la cantidad óptima de recursos en la nube que
         minimiza el costo total de alojamiento de una aplicación web.</p>
       </div>
       <div class="card">
+        <div class="card-icon">✅</div>
         <h3>Objetivos específicos</h3>
         <ol>
           <li>Modelar el costo de cómputo y almacenamiento en función del número de instancias.</li>
@@ -78,7 +86,8 @@
         </ol>
       </div>
     </div>
-    <div class="card">
+    <div class="card wide">
+      <div class="card-icon">❓</div>
       <h3>Preguntas de investigación</h3>
       <ul>
         <li>¿Cómo modelar el costo total de infraestructura cloud como una función derivable?</li>
@@ -90,21 +99,43 @@
   </section>
 
   <section id="modelo" class="section">
-    <h2>Modelamiento matemático y aplicación de la derivada</h2>
+    <span class="eyebrow">03 · Desarrollo matemático</span>
+    <h2>📐 Modelamiento matemático y aplicación de la derivada</h2>
     <p>Sea $x$ = número de instancias de cómputo contratadas.</p>
     <p>Costo de cómputo: $C_{comp}(x) = a x^2 + b x$ &nbsp;·&nbsp; Costo de almacenamiento: $C_{alm}(x) = c x + d$</p>
-    <p><strong>Costo total:</strong></p>
-    <p class="eq">$$C(x) = 0.5x^2 - 20x + 500$$</p>
-    <p><strong>Costo marginal (derivada):</strong></p>
-    <p class="eq">$$C'(x) = x - 20$$</p>
-    <p>Punto crítico: $C'(x)=0 \Rightarrow x = 20$. Segunda derivada: $C''(x) = 1 > 0 \Rightarrow$ es un <strong>mínimo</strong>.</p>
-    <p>Costo mínimo: $C(20) = 300$ USD/mes.</p>
+
+    <div class="grid-3">
+      <div class="card step-card">
+        <span class="step-num">1</span>
+        <h3>Costo total</h3>
+        <p class="eq">$$C(x) = 0.5x^2 - 20x + 500$$</p>
+      </div>
+      <div class="card step-card">
+        <span class="step-num">2</span>
+        <h3>Costo marginal (derivada)</h3>
+        <p class="eq">$$C'(x) = x - 20$$</p>
+      </div>
+      <div class="card step-card">
+        <span class="step-num">3</span>
+        <h3>Punto crítico y mínimo</h3>
+        <p>$C'(x)=0 \Rightarrow x = 20$<br/>$C''(x) = 1 > 0 \Rightarrow$ <strong>mínimo</strong></p>
+      </div>
+    </div>
+
+    <div class="result-box big">
+      Costo mínimo: <strong>C(20) = 300 USD/mes</strong>
+    </div>
   </section>
 
   <section id="simulador" class="section alt">
-    <h2>Simulador interactivo</h2>
-    <p>Ajusta los parámetros de la función de costo $C(x) = a x^2 + (b+c) x + d$ y observa cómo cambia
-    el punto óptimo (mínimo) en tiempo real.</p>
+    <span class="eyebrow">04 · Herramienta tecnológica</span>
+    <h2>🌐 Simulador 3D interactivo</h2>
+    <p>
+      La superficie muestra el costo total $C(x,a)$ variando simultáneamente el número de
+      <strong>instancias ($x$)</strong> y el parámetro de <strong>saturación de cómputo ($a$)</strong>.
+      El punto rojo marca el mínimo (derivada = 0) para el valor de <em>a</em> seleccionado.
+      Arrastra con el mouse para rotar, y usa el scroll para hacer zoom.
+    </p>
 
     <div class="controls">
       <label>a (saturación cómputo)
@@ -125,31 +156,36 @@
       Punto óptimo: <strong>x = 20</strong> instancias &nbsp;|&nbsp; Costo mínimo: <strong>300 USD/mes</strong>
     </div>
 
-    <canvas id="costChart" height="120"></canvas>
+    <div id="plot3d" class="plot-3d"></div>
+    <p class="plot-hint">Eje X: número de instancias &nbsp;·&nbsp; Eje Y: parámetro a &nbsp;·&nbsp; Eje Z: costo total (USD/mes)</p>
   </section>
 
   <section id="resultados" class="section">
-    <h2>Resultados y conclusiones</h2>
+    <span class="eyebrow">05 · Hallazgos</span>
+    <h2>📊 Resultados y conclusiones</h2>
     <table class="table">
       <thead>
         <tr><th>Escenario</th><th>Instancias (x)</th><th>Costo mensual C(x)</th></tr>
       </thead>
       <tbody>
-        <tr><td>Subdimensionado</td><td>5</td><td>412.5 USD</td></tr>
-        <tr class="highlight"><td>Óptimo (derivada)</td><td>20</td><td>300 USD</td></tr>
-        <tr><td>Sobredimensionado</td><td>35</td><td>412.5 USD</td></tr>
+        <tr><td>🔻 Subdimensionado</td><td>5</td><td>412.5 USD</td></tr>
+        <tr class="highlight"><td>⭐ Óptimo (derivada)</td><td>20</td><td>300 USD</td></tr>
+        <tr><td>🔺 Sobredimensionado</td><td>35</td><td>412.5 USD</td></tr>
       </tbody>
     </table>
-    <p>
-      Operar en el punto óptimo genera un ahorro estimado de <strong>27%</strong> respecto a los
-      escenarios mal dimensionados. La aplicación de la derivada permite resolver, de forma rigurosa
-      y cuantificable, un problema real y frecuente en Ingeniería en Informática: la asignación
-      óptima de recursos en la nube.
-    </p>
+    <div class="card savings-card">
+      <p>
+        Operar en el punto óptimo genera un ahorro estimado de <strong class="savings">27%</strong> respecto a los
+        escenarios mal dimensionados. La aplicación de la derivada permite resolver, de forma rigurosa
+        y cuantificable, un problema real y frecuente en Ingeniería en Informática: la asignación
+        óptima de recursos en la nube.
+      </p>
+    </div>
   </section>
 
   <section id="video" class="section alt">
-    <h2>Video de presentación</h2>
+    <span class="eyebrow">06 · Exposición</span>
+    <h2>🎥 Video de presentación</h2>
     <p>Reemplaza el siguiente marcador con el enlace de tu video (YouTube/Drive) una vez grabado.</p>
     <div class="video-placeholder">
       <p>🎬 Video de 5 minutos — pendiente de incrustar</p>
@@ -157,8 +193,9 @@
   </section>
 
   <section id="bibliografia" class="section">
-    <h2>Bibliografía y fuentes</h2>
-    <ul>
+    <span class="eyebrow">07 · Fuentes</span>
+    <h2>📚 Bibliografía y fuentes</h2>
+    <ul class="biblio-list">
       <li>Stewart, J. (2018). <em>Cálculo de una variable: Trascendentes tempranas</em> (8ª ed.). Cengage Learning.</li>
       <li>Documentación oficial de precios de AWS EC2: <a href="https://aws.amazon.com/ec2/pricing/" target="_blank" rel="noopener noreferrer">aws.amazon.com/ec2/pricing</a></li>
       <li>Documentación de sympy: <a href="https://docs.sympy.org/" target="_blank" rel="noopener noreferrer">docs.sympy.org</a></li>
