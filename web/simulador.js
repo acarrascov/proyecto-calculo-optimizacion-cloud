@@ -101,23 +101,47 @@ function calcular() {
     name: 'Curva de mínimos',
   };
 
+  // Techo de la superficie, usado para dibujar la línea de proyección vertical
+  const zTecho = Math.max(...zMatrix.flat());
+
+  // Línea vertical que "cae" desde el techo hasta el punto óptimo real (ancla visual)
+  const lineaProyeccion = {
+    type: 'scatter3d',
+    mode: 'lines',
+    x: [xOptimoRedondeado, xOptimoRedondeado],
+    y: [a, a],
+    z: [zTecho, costoMinimo],
+    line: { color: '#f472b6', width: 4, dash: 'dot' },
+    showlegend: false,
+    hoverinfo: 'skip',
+  };
+
   // Punto óptimo actual (marcador brillante, según el slider "a")
   const puntoOptimo = {
     type: 'scatter3d',
-    mode: 'markers',
+    mode: 'markers+text',
     x: [xOptimoRedondeado],
     y: [a],
     z: [costoMinimo],
-    marker: { color: '#f472b6', size: 10, symbol: 'diamond', line: { color: '#ffffff', width: 1 } },
+    marker: { color: '#f472b6', size: 12, symbol: 'diamond', line: { color: '#ffffff', width: 1.5 } },
+    text: [`x=${xOptimoRedondeado}`],
+    textposition: 'top center',
+    textfont: { color: '#f472b6', size: 13, family: 'JetBrains Mono, monospace' },
     name: `Mínimo actual (x=${xOptimoRedondeado})`,
   };
 
   const layout = {
     autosize: true,
-    margin: { l: 0, r: 0, t: 10, b: 0 },
+    margin: { l: 0, r: 0, t: 45, b: 0 },
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
     font: { color: '#cbd5e1', family: 'Space Grotesk, sans-serif' },
+    title: {
+      text: `Costo mínimo: <span style="color:#5eead4">${costoMinimo.toFixed(1)} USD/mes</span> en x = ${xOptimoRedondeado} instancias`,
+      font: { color: '#e6ebf5', size: 16, family: 'Space Grotesk, sans-serif' },
+      x: 0.02,
+      xanchor: 'left',
+    },
     scene: {
       xaxis: { title: 'x (instancias)', gridcolor: 'rgba(148,163,184,0.15)', zerolinecolor: 'rgba(148,163,184,0.3)', color: '#94a3b8' },
       yaxis: { title: 'a (saturación)', gridcolor: 'rgba(148,163,184,0.15)', zerolinecolor: 'rgba(148,163,184,0.3)', color: '#94a3b8' },
@@ -128,13 +152,13 @@ function calcular() {
     legend: { orientation: 'h', x: 0, y: 0, font: { color: '#cbd5e1' } },
   };
 
-  const config = { responsive: true, displaylogo: false };
+  const config = { responsive: true, displaylogo: false, scrollZoom: true };
 
   if (!plotIniciado) {
-    Plotly.newPlot(plotDiv, [superficie, curvaMinimos, puntoOptimo], layout, config);
+    Plotly.newPlot(plotDiv, [superficie, curvaMinimos, lineaProyeccion, puntoOptimo], layout, config);
     plotIniciado = true;
   } else {
-    Plotly.react(plotDiv, [superficie, curvaMinimos, puntoOptimo], layout, config);
+    Plotly.react(plotDiv, [superficie, curvaMinimos, lineaProyeccion, puntoOptimo], layout, config);
   }
 }
 
@@ -142,4 +166,21 @@ function calcular() {
 window.addEventListener('resize', () => {
   if (plotIniciado) Plotly.Plots.resize(plotDiv);
 });
+
+// Evita que el scroll normal de la página quede "atrapado" haciendo zoom del
+// gráfico 3D: solo se hace zoom si el usuario mantiene presionado Ctrl/Cmd
+// mientras usa la rueda; de lo contrario el scroll pasa de largo a la página.
+const plotStage = plotDiv.closest('.plot-stage') || plotDiv.parentElement;
+plotStage.addEventListener(
+  'wheel',
+  (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      return;
+    }
+    e.stopPropagation();
+  },
+  { capture: true, passive: false }
+);
+
 calcular();
