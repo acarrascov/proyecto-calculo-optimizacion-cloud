@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Optimización de Costos Cloud mediante la Derivada</title>
+<meta name="description" content="Proyecto de Cálculo: minimización del costo de alojamiento en la nube usando aplicación de la derivada." />
+<link rel="stylesheet" href="styles.css" />
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+
+<header class="hero">
+  <nav class="navbar">
+    <span class="brand">Cálculo · Proyecto ABPro</span>
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#problematica">Problemática</a></li>
+      <li><a href="#objetivos">Objetivos</a></li>
+      <li><a href="#modelo">Modelo</a></li>
+      <li><a href="#simulador">Simulador</a></li>
+      <li><a href="#resultados">Resultados</a></li>
+      <li><a href="#video">Video</a></li>
+      <li><a href="#bibliografia">Bibliografía</a></li>
+    </ul>
+  </nav>
+  <div class="hero-content">
+    <h1>Minimización del costo de alojamiento en la nube</h1>
+    <p class="subtitle">Aplicación de la Derivada a un problema real de Ingeniería en Informática</p>
+    <div class="hero-meta">
+      <span>Asignatura: Cálculo</span>
+      <span>Carrera: Ingeniería en Informática</span>
+      <span>Unidad 3 · Aplicación de la Derivada</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section id="problematica" class="section">
+    <h2>Definición del proyecto y problemática</h2>
+    <p>
+      Las empresas de desarrollo de software que alojan aplicaciones web en servidores en la nube
+      (AWS, Azure, GCP) pagan por dos componentes principales: <strong>capacidad de procesamiento
+      (cómputo)</strong> y <strong>capacidad de almacenamiento</strong>. Muchas pymes de desarrollo
+      de software sobredimensionan o subdimensionan sus recursos en la nube, pagando de más o
+      entregando un servicio lento, porque no calculan matemáticamente el punto óptimo de recursos
+      que minimiza el costo total.
+    </p>
+    <p>
+      Este proyecto modela el costo total de infraestructura en la nube como una función y usa la
+      <strong>derivada</strong> para encontrar el número óptimo de recursos (instancias) que
+      minimiza el gasto mensual sin sacrificar el rendimiento del sistema.
+    </p>
+  </section>
+
+  <section id="objetivos" class="section alt">
+    <h2>Objetivos y preguntas de investigación</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Objetivo general</h3>
+        <p>Determinar, mediante el uso de derivadas, la cantidad óptima de recursos en la nube que
+        minimiza el costo total de alojamiento de una aplicación web.</p>
+      </div>
+      <div class="card">
+        <h3>Objetivos específicos</h3>
+        <ol>
+          <li>Modelar el costo de cómputo y almacenamiento en función del número de instancias.</li>
+          <li>Aplicar el criterio de la primera y segunda derivada para hallar el costo mínimo.</li>
+          <li>Desarrollar un simulador que calcule el punto óptimo dados distintos parámetros.</li>
+          <li>Comparar el costo óptimo con escenarios mal dimensionados.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Preguntas de investigación</h3>
+      <ul>
+        <li>¿Cómo modelar el costo total de infraestructura cloud como una función derivable?</li>
+        <li>¿En qué punto la derivada del costo total se hace cero, y qué representa?</li>
+        <li>¿Cuánto se podría ahorrar operando en el punto óptimo?</li>
+        <li>¿Qué herramienta tecnológica automatiza este cálculo?</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="modelo" class="section">
+    <h2>Modelamiento matemático y aplicación de la derivada</h2>
+    <p>Sea $x$ = número de instancias de cómputo contratadas.</p>
+    <p>Costo de cómputo: $C_{comp}(x) = a x^2 + b x$ &nbsp;·&nbsp; Costo de almacenamiento: $C_{alm}(x) = c x + d$</p>
+    <p><strong>Costo total:</strong></p>
+    <p class="eq">$$C(x) = 0.5x^2 - 20x + 500$$</p>
+    <p><strong>Costo marginal (derivada):</strong></p>
+    <p class="eq">$$C'(x) = x - 20$$</p>
+    <p>Punto crítico: $C'(x)=0 \Rightarrow x = 20$. Segunda derivada: $C''(x) = 1 > 0 \Rightarrow$ es un <strong>mínimo</strong>.</p>
+    <p>Costo mínimo: $C(20) = 300$ USD/mes.</p>
+  </section>
+
+  <section id="simulador" class="section alt">
+    <h2>Simulador interactivo</h2>
+    <p>Ajusta los parámetros de la función de costo $C(x) = a x^2 + (b+c) x + d$ y observa cómo cambia
+    el punto óptimo (mínimo) en tiempo real.</p>
+
+    <div class="controls">
+      <label>a (saturación cómputo)
+        <input type="range" id="paramA" min="0.1" max="2" step="0.1" value="0.5" />
+        <span id="valA">0.5</span>
+      </label>
+      <label>b+c (término lineal)
+        <input type="range" id="paramB" min="-40" max="0" step="1" value="-20" />
+        <span id="valB">-20</span>
+      </label>
+      <label>d (costo fijo USD)
+        <input type="range" id="paramD" min="0" max="1000" step="10" value="500" />
+        <span id="valD">500</span>
+      </label>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      Punto óptimo: <strong>x = 20</strong> instancias &nbsp;|&nbsp; Costo mínimo: <strong>300 USD/mes</strong>
+    </div>
+
+    <canvas id="costChart" height="120"></canvas>
+  </section>
+
+  <section id="resultados" class="section">
+    <h2>Resultados y conclusiones</h2>
+    <table class="table">
+      <thead>
+        <tr><th>Escenario</th><th>Instancias (x)</th><th>Costo mensual C(x)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Subdimensionado</td><td>5</td><td>412.5 USD</td></tr>
+        <tr class="highlight"><td>Óptimo (derivada)</td><td>20</td><td>300 USD</td></tr>
+        <tr><td>Sobredimensionado</td><td>35</td><td>412.5 USD</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Operar en el punto óptimo genera un ahorro estimado de <strong>27%</strong> respecto a los
+      escenarios mal dimensionados. La aplicación de la derivada permite resolver, de forma rigurosa
+      y cuantificable, un problema real y frecuente en Ingeniería en Informática: la asignación
+      óptima de recursos en la nube.
+    </p>
+  </section>
+
+  <section id="video" class="section alt">
+    <h2>Video de presentación</h2>
+    <p>Reemplaza el siguiente marcador con el enlace de tu video (YouTube/Drive) una vez grabado.</p>
+    <div class="video-placeholder">
+      <p>🎬 Video de 5 minutos — pendiente de incrustar</p>
+    </div>
+  </section>
+
+  <section id="bibliografia" class="section">
+    <h2>Bibliografía y fuentes</h2>
+    <ul>
+      <li>Stewart, J. (2018). <em>Cálculo de una variable: Trascendentes tempranas</em> (8ª ed.). Cengage Learning.</li>
+      <li>Documentación oficial de precios de AWS EC2: <a href="https://aws.amazon.com/ec2/pricing/" target="_blank" rel="noopener noreferrer">aws.amazon.com/ec2/pricing</a></li>
+      <li>Documentación de sympy: <a href="https://docs.sympy.org/" target="_blank" rel="noopener noreferrer">docs.sympy.org</a></li>
+      <li>Apuntes de clases — Unidad 3: Aplicación de la Derivada.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  <p>Proyecto de Cálculo · Ingeniería en Informática · 2026</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
