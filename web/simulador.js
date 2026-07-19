@@ -65,26 +65,24 @@ function calcular() {
     x: xVals,
     y: aVals,
     z: zMatrix,
-    colorscale: [
-      [0, '#0f0326'],
-      [0.25, '#4c1d95'],
-      [0.5, '#7c3aed'],
-      [0.7, '#22d3ee'],
-      [1, '#5eead4'],
-    ],
-    opacity: 0.97,
+    colorscale: 'Viridis',
+    reversescale: false,
+    opacity: 1,
     showscale: true,
     colorbar: {
       title: 'USD/mes',
       titleside: 'right',
-      titlefont: { color: '#cbd5e1' },
-      tickfont: { color: '#94a3b8' },
+      titlefont: { color: '#cbd5e1', size: 12 },
+      tickfont: { color: '#94a3b8', size: 11 },
       outlinewidth: 0,
+      len: 0.75,
+      thickness: 14,
     },
     contours: {
-      z: { show: true, usecolormap: true, highlightcolor: '#f472b6', project: { z: true } },
+      z: { show: true, usecolormap: true, highlightcolor: '#ffffff', project: { z: true }, width: 1 },
     },
-    lighting: { ambient: 0.6, diffuse: 0.7, specular: 0.4, roughness: 0.5 },
+    lighting: { ambient: 0.55, diffuse: 0.85, specular: 0.25, roughness: 0.65, fresnel: 0.2 },
+    lightposition: { x: 100, y: -100, z: 200 },
   };
 
   // Curva de mínimos: traza el punto óptimo para cada valor de "a" en la superficie
@@ -97,12 +95,13 @@ function calcular() {
       const xm = Math.max(0, -b / (2 * av));
       return costo(av, b, d, xm);
     }),
-    line: { color: '#e0f2fe', width: 6 },
+    line: { color: '#ffffff', width: 7 },
     name: 'Curva de mínimos',
   };
 
   // Techo de la superficie, usado para dibujar la línea de proyección vertical
   const zTecho = Math.max(...zMatrix.flat());
+  const zPiso = Math.min(...zMatrix.flat());
 
   // Línea vertical que "cae" desde el techo hasta el punto óptimo real (ancla visual)
   const lineaProyeccion = {
@@ -143,10 +142,15 @@ function calcular() {
       xanchor: 'left',
     },
     scene: {
-      xaxis: { title: 'x (instancias)', gridcolor: 'rgba(148,163,184,0.15)', zerolinecolor: 'rgba(148,163,184,0.3)', color: '#94a3b8' },
-      yaxis: { title: 'a (saturación)', gridcolor: 'rgba(148,163,184,0.15)', zerolinecolor: 'rgba(148,163,184,0.3)', color: '#94a3b8' },
-      zaxis: { title: 'Costo (USD/mes)', gridcolor: 'rgba(148,163,184,0.15)', zerolinecolor: 'rgba(148,163,184,0.3)', color: '#94a3b8' },
-      camera: { eye: { x: 1.7, y: -1.7, z: 0.95 } },
+      xaxis: { title: 'x — instancias', gridcolor: 'rgba(148,163,184,0.2)', zerolinecolor: 'rgba(148,163,184,0.35)', color: '#cbd5e1', backgroundcolor: 'rgba(148,163,184,0.03)', showbackground: true },
+      yaxis: { title: 'a — saturación', gridcolor: 'rgba(148,163,184,0.2)', zerolinecolor: 'rgba(148,163,184,0.35)', color: '#cbd5e1', backgroundcolor: 'rgba(148,163,184,0.03)', showbackground: true },
+      zaxis: { title: 'Costo (USD/mes)', gridcolor: 'rgba(148,163,184,0.2)', zerolinecolor: 'rgba(148,163,184,0.35)', color: '#cbd5e1', backgroundcolor: 'rgba(148,163,184,0.05)', showbackground: true, range: [zPiso, zTecho] },
+      aspectmode: 'manual',
+      aspectratio: { x: 1.3, y: 1, z: 0.75 },
+      camera: {
+        eye: { x: 1.35, y: -1.9, z: 1.05 },
+        center: { x: 0, y: 0, z: -0.15 },
+      },
       bgcolor: 'rgba(0,0,0,0)',
     },
     legend: { orientation: 'h', x: 0, y: 0, font: { color: '#cbd5e1' } },
