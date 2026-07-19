@@ -32,7 +32,7 @@
 </header>
 
 <main class="sim-main">
-  <section class="sim-layout">
+  <section class="sim-controls-wrap">
     <div class="controls sim-controls">
       <label>a — saturación de cómputo
         <input type="range" id="paramA" min="0.1" max="2" step="0.1" value="0.5" />
@@ -51,8 +51,10 @@
     <div class="result-box big" id="resultBox">
       Punto óptimo: <strong>x = 20</strong> instancias &nbsp;|&nbsp; Costo mínimo: <strong>300 USD/mes</strong>
     </div>
+  </section>
 
-    <div id="plot3d" class="plot-3d plot-3d-full"></div>
+  <section class="plot-stage">
+    <div id="plot3d" class="plot-3d-full"></div>
     <p class="plot-hint">Eje X: número de instancias &nbsp;·&nbsp; Eje Y: parámetro a &nbsp;·&nbsp; Eje Z: costo total (USD/mes)</p>
   </section>
 </main>
