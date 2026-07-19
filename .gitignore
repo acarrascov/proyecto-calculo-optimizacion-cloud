@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 .DS_Store
 *.png
+*.mp4
 node_modules/
 .vercel/
 .vercel
