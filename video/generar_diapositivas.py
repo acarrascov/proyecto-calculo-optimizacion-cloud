@@ -22,6 +22,8 @@ FUENTE_TITULO = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
 FUENTE_TEXTO = "/System/Library/Fonts/Supplemental/Arial.ttf"
 FUENTE_MONO = "/System/Library/Fonts/SFNSMono.ttf"
 
+URL_SITIO = "proyecto-calculo-optimizacion-cloud.vercel.app"
+
 SALIDA = os.path.join(os.path.dirname(__file__), "diapositivas")
 os.makedirs(SALIDA, exist_ok=True)
 
@@ -63,7 +65,7 @@ def bullets(draw, items, y_inicio=420, gap=90, size=38, color=BLANCO):
         y += gap
 
 
-def pie(draw, texto="Cálculo · Proyecto ABPro · Unidad 3"):
+def pie(draw, texto=f"Cálculo · Unidad 3 · {URL_SITIO}"):
     f = fuente(FUENTE_MONO, 26)
     draw.text((120, ALTO - 90), texto, font=f, fill=GRIS)
 
@@ -76,7 +78,8 @@ draw.text((120, 480), "alojamiento en la nube", font=f_titulo, fill=CIAN)
 f_sub = fuente(FUENTE_TEXTO, 40)
 draw.text((120, 620), "Aplicación de la Derivada · Unidad 3 · Cálculo", font=f_sub, fill=GRIS)
 draw.text((120, 680), "Ingeniería en Informática", font=f_sub, fill=GRIS)
-pie(draw)
+f_url = fuente(FUENTE_MONO, 36)
+draw.text((120, 780), URL_SITIO, font=f_url, fill=CIAN)
 img.save(os.path.join(SALIDA, "01_intro.png"))
 
 # --- Diapositiva 2: Problemática y objetivos ---
@@ -120,7 +123,10 @@ bullets(draw, [
     "El punto óptimo se marca donde C'(x) = 0",
     "Parámetros a, b+c y d ajustables en tiempo real",
 ])
-pie(draw)
+f_prueba = fuente(FUENTE_TITULO, 42)
+draw.text((120, 760), "Pruébalo tú mismo en:", font=f_prueba, fill=GRIS)
+f_url = fuente(FUENTE_MONO, 44)
+draw.text((120, 820), URL_SITIO, font=f_url, fill=CIAN)
 img.save(os.path.join(SALIDA, "04_simulador.png"))
 
 # --- Diapositiva 5: Resultados ---
@@ -160,7 +166,8 @@ for linea in texto_final:
     y += 60
 f_gracias = fuente(FUENTE_TITULO, 60)
 draw.text((120, 700), "Gracias por su atención", font=f_gracias, fill=CIAN)
-pie(draw)
+f_url = fuente(FUENTE_MONO, 38)
+draw.text((120, 800), f"Revisa el proyecto en: {URL_SITIO}", font=f_url, fill=TEAL)
 img.save(os.path.join(SALIDA, "06_conclusion.png"))
 
 print(f"Diapositivas generadas en: {SALIDA}")
