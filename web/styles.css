@@ -642,6 +642,21 @@ strong { color: var(--text); }
   box-shadow: var(--shadow-card);
 }
 
+.video-embed {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.video-embed video {
+  display: block;
+  width: 100%;
+  border-radius: 16px;
+  background: #000;
+}
+
 .biblio-list {
   background: var(--surface);
   border: 1px solid var(--border);
