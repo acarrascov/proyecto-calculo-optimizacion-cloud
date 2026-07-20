@@ -63,6 +63,34 @@
     <div id="plotChart" class="plot-3d-full"></div>
     <p class="plot-hint">Curva cian: costo total &nbsp;·&nbsp; curva violeta punteada: costo marginal (derivada) &nbsp;·&nbsp; el punto rosado marca el mínimo, donde la derivada cruza cero</p>
   </section>
+
+  <section class="sim-controls-wrap sim-extra">
+    <div class="grid-2">
+      <div class="card">
+        <h3>Verificación con la 2ª derivada</h3>
+        <p id="segundaDerivadaBox"></p>
+      </div>
+      <div class="card savings-card">
+        <h3>Ahorro proyectado a 12 meses</h3>
+        <p id="ahorroAnualBox"></p>
+      </div>
+    </div>
+
+    <div class="card wide">
+      <h3>Comparación de escenarios: sub/sobre-dimensionar vs. el óptimo</h3>
+      <table class="table" id="tablaEscenarios">
+        <thead>
+          <tr>
+            <th>Escenario</th>
+            <th>Instancias (x)</th>
+            <th>Costo mensual</th>
+            <th>Diferencia vs. óptimo</th>
+          </tr>
+        </thead>
+        <tbody id="tablaEscenariosBody"></tbody>
+      </table>
+    </div>
+  </section>
 </main>
 
 <footer>

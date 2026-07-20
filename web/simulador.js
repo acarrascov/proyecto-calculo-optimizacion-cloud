@@ -7,6 +7,9 @@ const valB = document.getElementById('valB');
 const valD = document.getElementById('valD');
 const resultBox = document.getElementById('resultBox');
 const plotDiv = document.getElementById('plotChart');
+const segundaDerivadaBox = document.getElementById('segundaDerivadaBox');
+const ahorroAnualBox = document.getElementById('ahorroAnualBox');
+const tablaEscenariosBody = document.getElementById('tablaEscenariosBody');
 
 function costo(a, b, d, x) {
   return a * x * x + b * x + d;
@@ -18,6 +21,23 @@ function costoMarginal(a, b, x) {
 
 const X_MAX = 45;
 const X_STEPS = 200;
+
+// Escenarios para comparar el óptimo contra sub/sobre-dimensionamiento
+const ESCENARIOS = [
+  { etiqueta: 'Muy subdimensionado', delta: -15 },
+  { etiqueta: 'Subdimensionado', delta: -8 },
+  { etiqueta: 'Óptimo', delta: 0 },
+  { etiqueta: 'Sobredimensionado', delta: 8 },
+  { etiqueta: 'Muy sobredimensionado', delta: 15 },
+];
+
+function construirEscenarios(a, b, d, xOptimoRedondeado, costoMinimo) {
+  return ESCENARIOS.map(({ etiqueta, delta }) => {
+    const x = Math.min(X_MAX, Math.max(0, xOptimoRedondeado + delta));
+    const c = costo(a, b, d, x);
+    return { etiqueta, x, costo: c, diferencia: c - costoMinimo, esOptimo: delta === 0 };
+  });
+}
 
 function construirCurvas(a, b, d) {
   const xVals = [];
@@ -49,6 +69,32 @@ function calcular() {
   const costoMinimo = costo(a, b, d, xOptimoRedondeado);
 
   resultBox.innerHTML = `Punto óptimo: <strong>x = ${xOptimoRedondeado}</strong> instancias &nbsp;|&nbsp; Costo mínimo: <strong>${costoMinimo.toFixed(1)} USD/mes</strong>`;
+
+  // Criterio de la segunda derivada: C''(x) = 2a, constante y > 0 (a > 0 siempre en el slider)
+  const segundaDerivada = 2 * a;
+  segundaDerivadaBox.innerHTML = `C''(x) = 2a = <strong>${segundaDerivada.toFixed(1)}</strong> &gt; 0 → se confirma que x = ${xOptimoRedondeado} es un <strong>mínimo</strong> (no un máximo ni un punto de inflexión).`;
+
+  // Comparación de escenarios y ahorro proyectado
+  const escenarios = construirEscenarios(a, b, d, xOptimoRedondeado, costoMinimo);
+  tablaEscenariosBody.innerHTML = escenarios
+    .map(
+      (f) => `
+    <tr${f.esOptimo ? ' class="highlight"' : ''}>
+      <td>${f.etiqueta}</td>
+      <td>${f.x}</td>
+      <td>${f.costo.toFixed(1)} USD/mes</td>
+      <td>${f.esOptimo ? '—' : (f.diferencia >= 0 ? '+' : '') + f.diferencia.toFixed(1) + ' USD/mes'}</td>
+    </tr>`
+    )
+    .join('');
+
+  const peorEscenario = escenarios.reduce((peor, f) => (f.costo > peor.costo ? f : peor), escenarios[0]);
+  const ahorroMensual = peorEscenario.costo - costoMinimo;
+  const ahorroAnual = ahorroMensual * 12;
+  ahorroAnualBox.innerHTML =
+    ahorroMensual > 0
+      ? `Si en vez del óptimo se operara con <strong>${peorEscenario.x} instancias</strong> (${peorEscenario.etiqueta.toLowerCase()}), el costo subiría a <strong>${peorEscenario.costo.toFixed(1)} USD/mes</strong>. Ajustar al óptimo ahorra <span class="savings">${ahorroAnual.toFixed(0)} USD/año</span> (${ahorroMensual.toFixed(1)} USD/mes).`
+      : `Con estos parámetros, los escenarios comparados no superan el costo del óptimo dentro del rango mostrado.`;
 
   const { xVals, yCosto, yMarginal } = construirCurvas(a, b, d);
 

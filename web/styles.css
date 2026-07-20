@@ -581,6 +581,18 @@ strong { color: var(--text); }
   padding: 0 1.25rem 2.5rem;
 }
 
+.sim-extra {
+  margin-top: 0.5rem;
+  padding-bottom: 3rem;
+}
+
+.sim-extra h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.9rem;
+}
+
+.sim-extra .card p { margin: 0; }
+
 /* ---------- TABLE ---------- */
 
 .table {
