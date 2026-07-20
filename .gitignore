@@ -7,3 +7,7 @@ __pycache__/
 node_modules/
 .vercel/
 .vercel
+video/audio_muestras/
+video/audio_narracion/
+video/capturas_sitio/
+video/generar_narracion_ia.py
